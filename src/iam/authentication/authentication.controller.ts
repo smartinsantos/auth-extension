@@ -14,7 +14,20 @@ export class AuthenticationController {
 
   @HttpCode(HttpStatus.OK)
   @Post('sign-in')
-  signIn(@Body() signInDto: SignInDto) {
+  signIn(
+    // @Res({ passthrough: true }) response: Response,
+    @Body() signInDto: SignInDto,
+  ) {
+    /*
+      // *** safer approach using cookies ***
+      const accessToken = await this.authService.signIn(signInDto);
+      response.cookie('accessToken', accessToken, {
+        secure: true,
+        httpOnly: true,
+        sameSite: true,
+      });
+    */
+
     return this.authService.signIn(signInDto);
   }
 }

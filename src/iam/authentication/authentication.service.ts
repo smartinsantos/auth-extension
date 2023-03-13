@@ -1,8 +1,12 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import jwtConfig from '../config/jwt.config';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigType } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -15,6 +19,9 @@ export class AuthenticationService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly hashingService: HashingService,
+    private readonly jwtService: JwtService,
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
@@ -50,7 +57,20 @@ export class AuthenticationService {
     if (!passwordMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    // @TODO: We'll fill this gap with jwt instead of a boolean value
-    return true;
+
+    const accessToken = await this.jwtService.signAsync(
+      {
+        sub: user.id,
+        email: user.email,
+      },
+      {
+        audience: this.jwtConfiguration.audience,
+        issuer: this.jwtConfiguration.issuer,
+        secret: this.jwtConfiguration.secret,
+        expiresIn: this.jwtConfiguration.accessTokenTtl,
+      },
+    );
+
+    return { accessToken };
   }
 }

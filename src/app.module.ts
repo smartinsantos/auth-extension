@@ -5,12 +5,11 @@ import { CoffeesModule } from './coffees/coffees.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { IamModule } from './iam/iam.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    CoffeesModule,
-    UsersModule,
-    // TypeOrm module info (username/password/etc from our docker-compose file)
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -21,6 +20,8 @@ import { IamModule } from './iam/iam.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    CoffeesModule,
+    UsersModule,
     IamModule,
   ],
   controllers: [AppController],
