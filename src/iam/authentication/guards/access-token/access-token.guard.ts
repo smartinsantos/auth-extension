@@ -31,7 +31,7 @@ export class AccessTokenGuard implements CanActivate {
         token,
         this.jwtConfiguration,
       );
-
+      // attaching the user key to the request with the token decoded payload
       request[REQUEST_USER_KEY] = payload;
       return true;
     } catch (error) {
